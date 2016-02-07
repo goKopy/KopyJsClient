@@ -1,0 +1,14 @@
+{
+  "name": "KopyJsClient",
+  "version": "0.0.1",
+  "description": "Kopy client written in JavaScript packaged as a node module",
+  "main": "kopy-js-client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kopy Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.9.1"
+  }
+}

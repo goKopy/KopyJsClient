@@ -1,4 +1,5 @@
-var axios = require('axios');
+//var axios = require('axios');
+'use strict';
 
 // TODO handle the two resources : users & users.items.files
 // TODO get all items take parameters like count, cursor & filter.
@@ -14,11 +15,11 @@ var axios = require('axios');
 
   var MSG_NOT_INT = 'Warning: U didn\'t pass a int :(';
 
-  KopyService = function(baseUrl) {
-      return new KopyService.init(baseUrl);
-  }
+  var KopyService = function(baseUrl) {
+      return new KopyService.Init(baseUrl);
+  };
 
-  KopyService.init = function(baseUrl) {
+  KopyService.Init = function(baseUrl) {
 
     this.http = axios.create({
       baseURL: baseUrl || 'http://api2-pp.gokopy.com',
@@ -28,7 +29,7 @@ var axios = require('axios');
     });
 
     if(token) {
-      this.http.defaults.headers['Authorization'] = 'Bearer ' + token;
+      this.http.defaults.headers.Authorization = 'Bearer ' + token;
     }
 
     // KP.user( ==> userId <== ).items(object).get()
@@ -43,7 +44,7 @@ var axios = require('axios');
 
     this.http.interceptors.response
       .use(function (response) {
-        if( response.data.data['user'] !== undefined ) {
+        if( response.data.data.user !== undefined ) {
           token = response.data.data.user.token;
         }
         return response.data;
@@ -52,15 +53,21 @@ var axios = require('axios');
       });
   };
 
-  KopyService.init.prototype = KopyService.prototype = {};
+  KopyService.Init.prototype = KopyService.prototype = {};
 
-  //init methods : items(), devices(), etc.
+  //Init methods : items(), devices(), etc.
   ['items', 'devices', 'hashtags', 'friends'].forEach(function(object) {
     KopyService.prototype[object] = function(param) {
         this.objectName = object;
         this.object = param;
         return this;
-    }});
+    };
+  });
+
+  // function utilities
+  var isInt = function(value) {
+    return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value));
+  };
 
   KopyService.prototype.getUrl = function() {
     var url = '/users/' + this.userId + '/' + this.objectName;
@@ -68,7 +75,7 @@ var axios = require('axios');
       url += '/' + this.object;
     }
     return url;
-  }
+  };
 
   KopyService.prototype.get = function () {
     if(!isInt(this.object)) {
@@ -82,10 +89,10 @@ var axios = require('axios');
       console.warn(MSG_NOT_INT);
     }
     return this.http.delete(this.getUrl());
-  }
+  };
 
   KopyService.prototype.save = function () {
-    var httpVerb = object.hasOwnProperty('id') ? this.http.put : this.http.post;
+    var httpVerb = this.object.hasOwnProperty('id') ? this.http.put : this.http.post;
     return httpVerb(this.getUrl(), this.object);
   };
 
@@ -105,14 +112,9 @@ var axios = require('axios');
     return this;
   };
 
-  // function utilities
-  var isInt = function(value) {
-    return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value));
-  }
+  global.KP = KopyService;
 
-  global.KP = KP = KopyService;
-
-}(global, axios));
+}(window, axios));
 
 // Examples
 /*
